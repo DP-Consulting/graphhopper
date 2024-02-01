@@ -21,10 +21,8 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.GraphHopperConfig;
-import com.graphhopper.util.Helper;
-import com.graphhopper.util.Parameters;
-import com.graphhopper.util.StopWatch;
-import com.graphhopper.util.TranslationMap;
+import com.graphhopper.json.Statement;
+import com.graphhopper.util.*;
 import com.graphhopper.util.shapes.GHPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +163,11 @@ public class NavigateResource {
     private GHResponse calcRoute(List<Double> headings, List<GHPoint> requestPoints, String profileStr,
                                  String localeStr, boolean enableInstructions, double minPathPrecision) {
         GHRequest request = new GHRequest(requestPoints);
+
+        CustomModel customModel = new CustomModel();
+        customModel.addToPriority(Statement.If("road_class == TRACK", Statement.Op.MULTIPLY, "0.0"));
+        request.setCustomModel(customModel);
+
         if (headings.size() > 0)
             request.setHeadings(headings);
 
